@@ -58,9 +58,23 @@ const PIECES = [
   ],
 ];
 
+// color palette for pieces. Index 0
+//  is empty cell.
+const COLORS = [
+  null,
+  "#FFEB3B", // yellow
+  "#F44336", // red
+  "#03A9F4", // blue
+  "#FF9800", // orange
+  "#4CAF50", // green
+];
+
+// create a new random piece with a color index (1..COLORS.length-1)
+const initialIndex = Math.floor(Math.random() * PIECES.length);
 const piece = {
   position: { x: 5, y: 0 },
-  shape: PIECES[Math.floor(Math.random() * PIECES.length)],
+  shape: PIECES[initialIndex],
+  color: initialIndex + 1,
 };
 
 // 2. game loop
@@ -94,8 +108,9 @@ function draw() {
 
   board.forEach((row, y) => {
     row.forEach((value, x) => {
-      if (value == 1) {
-        context.fillStyle = "yellow";
+      if (value != 0) {
+        // value is a color index into COLORS
+        context.fillStyle = COLORS[value] || "yellow";
         context.fillRect(x, y, 1, 1);
       }
     });
@@ -104,7 +119,7 @@ function draw() {
   piece.shape.forEach((row, y) => {
     row.forEach((value, x) => {
       if (value) {
-        context.fillStyle = "red";
+        context.fillStyle = COLORS[piece.color] || "red";
         context.fillRect(piece.position.x + x, piece.position.y + y, 1, 1);
       }
     });
@@ -172,13 +187,16 @@ function solidifyPiece() {
   piece.shape.forEach((row, y) => {
     row.forEach((value, x) => {
       if (value == 1) {
-        board[y + piece.position.y][x + piece.position.x] = 1;
+        // store the piece's color index in the board so it keeps its color
+        board[y + piece.position.y][x + piece.position.x] = piece.color;
       }
     });
   });
 
   // get random piece
-  piece.shape = PIECES[Math.floor(Math.random() * PIECES.length)];
+  const randomIndex = Math.floor(Math.random() * PIECES.length);
+  piece.shape = PIECES[randomIndex];
+  piece.color = randomIndex + 1;
 
   // reset position
   piece.position.x = 0;
@@ -194,7 +212,8 @@ function removeRows() {
   const rowsToRemove = [];
 
   board.forEach((row, y) => {
-    if (row.every((value) => value === 1)) {
+    // row is full if every cell is non-zero (has a color index)
+    if (row.every((value) => value !== 0)) {
       rowsToRemove.push(y);
     }
   });
