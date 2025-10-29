@@ -4,7 +4,7 @@
 
 ## Description
 
-Tetris with HTML and Javascript.
+Tetris with HTML and JavaScript.
 
 ## Index
 
